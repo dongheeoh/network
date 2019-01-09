@@ -17,61 +17,63 @@ public class EchoClient {
 	private static final int SERVER_PORT=5001;
 	
 	public static void main(String[] args) {
-		Socket socket=null;
-
+		Scanner scanner = null;
+		Socket socket = null;
+		
 		try {
-			//1. 소켓생성(Client Socket)
-			socket=new Socket();
-			//키보드사용(표준입력 연결)
-			Scanner scanner=new Scanner(System.in);
+			//1. Scanner 생성(표준입력 연결)
+			scanner = new Scanner(System.in);
 			
-			//2. 서버연결 - 바로accept
+			//2. 소켓 생성
+			socket = new Socket();
+
+			//3. 서버 연결
 			socket.connect(new InetSocketAddress(SERVER_IP, SERVER_PORT));
-			System.out.println("[client] connected");
+			log("connected");
 			
-			//3.IOStream 받아오기
-			//InputStream is=socket.getInputStream();
-			//OutputStream os=socket.getOutputStream();
-			BufferedReader br=new BufferedReader(new InputStreamReader(socket.getInputStream(),"UTF-8"));
-			PrintWriter pw=new PrintWriter(new OutputStreamWriter(socket.getOutputStream(),"UTF-8"),true);
+			//4. IOStream 생성(받아오기)
+			BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
+			PrintWriter pw = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"), true);
 			
-			
-			
-			
-			while (true) {
-				// 4.쓰기(전송)
+			while(true) {
+				//5. 키보드 입력 받기
 				System.out.print(">>");
-				String line=scanner.nextLine();
+				String line = scanner.nextLine();
 				if("quit".contentEquals(line)) {
 					break;
 				}
+				
+				//6. 데이터 쓰기(전송)
 				pw.println(line);
-
-				// 5.읽기(수신)
-				String data = br.readLine();// blocking
-				if (data== null) {
-					System.out.println("[server] closed by client");
+				
+				//7. 데이터 읽기(수신)
+				String data = br.readLine();
+				if(data == null) {
+					log("closed by server");
 					break;
 				}
-				//콘솔출력
-				System.out.println("<<"+data);
-
+				
+				//8. 콘솔 출력
+				System.out.println("<<" + data);
 			}
-			
-			
 		} catch (IOException e) {
-			e.printStackTrace();
-		}finally {
+			log("error:" + e);
+		} finally {
 			try {
-				if(socket!=null && socket.isClosed()==false) {
+				if(scanner != null) {
+					scanner.close();
+				}
+				if(socket != null && socket.isClosed() == false) {
 					socket.close();
 				}
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				log("error:" + e);
 			}
 		}
+	}
 
+	private static void log(String log) {
+		System.out.println("[client] " + log);
 	}
 
 }
