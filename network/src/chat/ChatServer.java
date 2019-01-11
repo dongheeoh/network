@@ -22,6 +22,8 @@ public class ChatServer {
 			serverSocket = new ServerSocket();
 			
 			
+			//1-1. set option 종료후 빨리 바인딩 하기위함
+			serverSocket.setReuseAddress(true);
 			//2. Binding
 			String localhostAddress = InetAddress.getLocalHost().getHostAddress();
 			serverSocket.bind(new InetSocketAddress(localhostAddress, PORT));

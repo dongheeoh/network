@@ -10,9 +10,10 @@ import java.nio.charset.StandardCharsets;
 class ChatClientThread extends Thread {
 	Socket socket = null;
 	TextArea textArea;
-	ChatClientThread(Socket socket,TextArea textArea) {
+
+	ChatClientThread(Socket socket, TextArea textArea) {
 		this.socket = socket;
-		this.textArea=textArea;
+		this.textArea = textArea;
 	}
 
 	public void run() {
@@ -24,8 +25,7 @@ class ChatClientThread extends Thread {
 				textArea.append(msg);
 				textArea.append("\n");
 			}
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}

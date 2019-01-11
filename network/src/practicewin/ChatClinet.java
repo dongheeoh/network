@@ -15,18 +15,18 @@ import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 public class ChatClinet {
-	private static final String SERVER_IP = "218.39.221.66";
+	private static final String SERVER_IP = "218.39.221.67";
 	private static final int SERVER_PORT = 5000;
 
 	public static void main(String[] args) {
 		String name = null;
 		Scanner scanner = new Scanner(System.in);
-		
+
 		while (true) {
 			System.out.println("대화명을 입력하세요.");
 			System.out.print(">>> ");
 			name = scanner.nextLine();
-			
+
 			if (name.isEmpty() == false) {
 				break;
 			}
@@ -37,21 +37,19 @@ public class ChatClinet {
 
 		Socket socket = new Socket();
 
-		//연결 & JOIN처리
+		// 연결 & JOIN처리
 		try {
 			socket.connect(new InetSocketAddress(SERVER_IP, SERVER_PORT));
 			consoleLog("채팅방에 입장하였습니다.");
 			new ChatWindow(name, socket).show();
 			PrintWriter pw = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8),
 					true);
-			String request = "join:" + name + "\r\n";
+			String request = "join:" + name +"\r\n";
 			pw.println(request);
-			
-		}catch (IOException e) {
+
+		} catch (IOException e) {
 			e.printStackTrace();
-
 		}
-
 	}
 
 	private static void consoleLog(String log) {

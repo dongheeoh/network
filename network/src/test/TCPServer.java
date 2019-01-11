@@ -58,6 +58,11 @@ public class TCPServer {
 				System.out.println("[server] received :"+data); //echo bufferdRead는 "\n"떨어져있음
 			
 				//6. 데이터쓰기
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 				os.write(data.getBytes("UTF-8"));
 			}
 			}catch(SocketException e) {

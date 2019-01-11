@@ -17,40 +17,41 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ChatServer {
+	//포트 사용키
 	public static final int PORT = 5000;
+
 	public static void main(String[] args) {
-    ServerSocket serverSocket = null;
-    List<PrintWriter> listWriters = new ArrayList<PrintWriter>();
+		ServerSocket serverSocket = null;
+		//writerPool에 사용할 list
+		List<PrintWriter> listWriters = new ArrayList<PrintWriter>();
 
-    try {
-      // 1. 서버 소켓 생성
-      serverSocket = new ServerSocket();
-      // 2. 바인딩
-      String hostAddress = InetAddress.getLocalHost().getHostAddress();
-      serverSocket.bind( new InetSocketAddress(hostAddress, PORT) );
-      consoleLog("연결 기다림 - " + hostAddress + ":" + PORT);
+		try {
+			// 1. 서버 소켓 생성
+			serverSocket = new ServerSocket();
+			// 2. 바인딩
+			String hostAddress = InetAddress.getLocalHost().getHostAddress(); //로칼호스트 뽑아냄
+			serverSocket.bind(new InetSocketAddress(hostAddress, PORT));
+			consoleLog("연결 기다림 - " + hostAddress + ":" + PORT);
 
-      // 3. 요청 대기
-      while(true) {
-        Socket socket = serverSocket.accept();
-        new ChatSeverThread(socket, listWriters).start();
-      }
-    }catch (IOException e) {
-
-      e.printStackTrace();
-
-    }finally {
-      try {
-        if( serverSocket != null && serverSocket.isClosed()==false ) {
-          serverSocket.close();
-        }
-      }catch (IOException e) {
-        e.printStackTrace();
-      }
-
-    }
-
-  }
+			// 3. 요청 대기
+			while (true) {
+				//4. 연결(accept)
+				Socket socket = serverSocket.accept();
+				//5. chatSeverThread실행 -> 다중처리위함
+				new ChatSeverThread(socket, listWriters).start();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (serverSocket != null && serverSocket.isClosed() == false) {
+					serverSocket.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
 	private static void consoleLog(String log) {
 		System.out.println("[server " + Thread.currentThread().getId() + "] " + log);

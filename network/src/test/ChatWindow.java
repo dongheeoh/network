@@ -1,96 +1,73 @@
-package practicewin;
-
+package test;
 import java.awt.BorderLayout;
-
 import java.awt.Button;
-
 import java.awt.Color;
-
 import java.awt.Frame;
-
 import java.awt.Panel;
-
 import java.awt.TextArea;
-
 import java.awt.TextField;
-
 import java.awt.event.ActionEvent;
-
 import java.awt.event.ActionListener;
-
 import java.awt.event.KeyAdapter;
-
 import java.awt.event.KeyEvent;
-
 import java.awt.event.WindowAdapter;
-
 import java.awt.event.WindowEvent;
-
-import java.io.BufferedReader;
-
-import java.io.IOException;
-
-import java.io.InputStreamReader;
-
-import java.io.OutputStreamWriter;
-
 import java.io.PrintWriter;
-
-import java.net.InetSocketAddress;
-
+import java.io.Writer;
 import java.net.Socket;
-
-import java.nio.charset.StandardCharsets;
 
 public class ChatWindow {
 
-	private String name;
 	private Frame frame;
 	private Panel pannel;
 	private Button buttonSend;
 	private TextField textField;
 	private TextArea textArea;
-	private Socket socket;
+	private Writer writer;
 
-	public ChatWindow(String name, Socket socket) {
-
-		this.name = name;
-		frame = new Frame(name + "님의 채팅방");
+	public ChatWindow(String name, Writer writer) {
+		this.writer = writer;
+		frame = new Frame(name);
 		pannel = new Panel();
 		buttonSend = new Button("Send");
 		textField = new TextField();
 		textArea = new TextArea(30, 80);
-		this.socket = socket;
-
-		// 스레드시작
-		new ChatClientThread(socket, textArea).start();
-
 	}
 
+	public TextArea getTextArea() {
+		return textArea;
+	}
+
+	public void setTextArea(TextArea textArea) {
+		this.textArea = textArea;
+	}
+
+
+
 	public void show() {
-
 		// Button
-
 		buttonSend.setBackground(Color.GRAY);
 		buttonSend.setForeground(Color.WHITE);
-		buttonSend.addActionListener(new ActionListener() {
+		buttonSend.addActionListener( new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent actionEvent) {
+			public void actionPerformed( ActionEvent actionEvent ) {
 				sendMessage();
 			}
-
 		});
+
 		// Textfield
 		textField.setColumns(80);
 		textField.addKeyListener(new KeyAdapter() {
-			public void keyReleased(KeyEvent e) {
+
+			@Override
+			public void keyPressed(KeyEvent e) {
 				char keyCode = e.getKeyChar();
-				if (keyCode == KeyEvent.VK_ENTER) {
+				if(keyCode==KeyEvent.VK_ENTER) {
 					sendMessage();
 				}
 			}
-		});
 
+		});
 		// Pannel
 		pannel.setBackground(Color.LIGHT_GRAY);
 		pannel.add(textField);
@@ -100,40 +77,33 @@ public class ChatWindow {
 		// TextArea
 		textArea.setEditable(false);
 		frame.add(BorderLayout.CENTER, textArea);
+
 		// Frame
 		frame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
-				PrintWriter pw;
-				try {
-					pw = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8),
-							true);
-					String request = "quit\r\n";
-					pw.println(request);
-					System.exit(0);
-				}
-
-				catch (IOException e1) {
-					e1.printStackTrace();
-				}
+				System.exit(0);
 			}
 		});
-
 		frame.setVisible(true);
 		frame.pack();
 	}
 
 	private void sendMessage() {
-		PrintWriter pw;
-		try {
-			pw = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8), true);
-			String message = textField.getText();
-			String request = "message:" + message + "\r\n";
-			pw.println(request);
-			textField.setText("");
-			textField.requestFocus();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+		String message = textField.getText();
+		PrintWriter printWriter = (PrintWriter) writer; 
 
+		if("quit".equals(message)==true) {
+			printWriter.println("quit");
+			printWriter.flush();
+			System.exit(0);
+		} else {
+			printWriter.println("message:"+frame.getTitle()+":"+message);
+			printWriter.flush();
+		}
+
+
+		textField.setText("");
+		textField.requestFocus();
+
+	}
 }
